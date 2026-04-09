@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <!-- 
+    Ellie Dashboard - Mobile-First OpenClaw Monitoring
+    Desain untuk mobile-first dengan Bahasa Indonesia
+    
+    Author: Ellie AI Assistant
+    Version: 1.0.0
+  -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>💜 Ellie Dashboard</title>
+  <style>
+    /* ============================================
+       CSS VARIABLES - Design System
+       ============================================ */
+    :root {
+      --bg: #0f0f14;           /* Background utama - gelap */
+      --card: #1a1a24;          /* Background card */
+      --card-hover: #222233;    /* Background card saat hover */
+      --accent: #8b5cf6;       /* Warna utama - ungu */
+      --accent2: #6366f1;      /* Warna sekunder - biru */
+      --success: #10b981;       /* Warna sukses - hijau */
+      --warning: #f59e0b;       /* Warna warning - kuning */
+      --danger: #ef4444;        /* Warna danger - merah */
+      --text: #e2e8f0;          /* Warna text utama */
+      --text-dim: #94a3b8;      /* Warna text sekunder */
+      --border: #2a2a3a;        /* Warna border */
+    }
+    
+    /* ============================================
+       BASE STYLES
+       ============================================ */
+    * { 
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+      /* Disable tap highlight untuk mobile */
+      -webkit-tap-highlight-color: transparent; 
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      /* Padding bawah untuk nav + safe area mobile */
+      min-height: 100vh;
+      padding: 16px;
+      padding-bottom: 120px;
+    }
+    
+    /* ============================================
+       HEADER
+       ============================================ */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      /* Gradient text effect */
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+    
+    /* Status dot dengan glow effect */
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+    }
+    
+    /* ============================================
+       REFRESH BUTTON
+       ============================================ */
+    .refresh-btn {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+    }
+    
+    .refresh-btn:active { transform: scale(0.92); }
+    .refresh-btn .icon { font-size: 20px; }
+    
+    /* Spinning animation untuk refresh */
+    .spinning .icon { animation: spin 1s linear infinite; }
+    
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    
+    /* ============================================
+       CARDS - Container untuk konten
+       ============================================ */
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      margin-bottom: 14px;
+    }
+    
+    .section { margin-bottom: 20px; }
+    
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    /* ============================================
+       OVERVIEW GRID - Stats utama di atas
+       ============================================ */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;  /* 2 kolom sama besar */
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    
+    .overview-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+    
+    .overview-card .value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    
+    /* Variant colors untuk value */
+    .overview-card .value.green { color: var(--success); }
+    .overview-card .value.yellow { color: var(--warning); }
+    .overview-card .value.blue { color: #3b82f6; }
+    
+    .overview-card .label {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+    
+    /* ============================================
+       MINI STATS - 2x2 grid untuk system stats
+       ============================================ */
+    .mini-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;  /* 2 kolom */
+      gap: 10px;
+    }
+    
+    .mini-stat {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+    
+    .mini-stat .value {
+      font-size: 22px;
+      font-weight: 700;
+    }
+    
+    .mini-stat .label {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+    
+    /* ============================================
+       PROGRESS BAR
+       ============================================ */
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--border);
+      border-radius: 4px;
+      margin-top: 12px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--success), #34d399);
+      transition: width 0.5s;  /* Animasi smooth */
+    }
+    
+    /* ============================================
+       QUICK ACTIONS - Grid 3 kolom
+       ============================================ */
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);  /* 3 kolom */
+      gap: 10px;
+    }
+    
+    .action-btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;  /* Smooth transition */
+    }
+    
+    .action-btn:active {
+      transform: scale(0.94);
+      background: var(--card-hover);
+    }
+    
+    .action-icon { font-size: 26px; margin-bottom: 6px; }
+    .action-label { font-size: 11px; color: var(--text-dim); font-weight: 500; }
+    
+    /* ============================================
+       ACTIVITY LIST
+       ============================================ */
+    .activity-item {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--border);
+    }
+    
+    .activity-left { display: flex; align-items: center; gap: 12px; }
+    .activity-icon { font-size: 20px; }
+    .activity-text { font-size: 13px; }
+    .activity-time { font-size: 11px; color: var(--text-dim); }
+    
+    /* ============================================
+       TOGGLE SWITCH
+       ============================================ */
+    .toggle {
+      width: 48px;
+      height: 26px;
+      border-radius: 13px;
+      background: var(--success);
+      position: relative;
+      cursor: pointer;
+    }
+    
+    .toggle.off { background: var(--text-dim); }
+    
+    /* Slider circle di dalam toggle */
+    .toggle::after {
+      content: '';
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: white;
+      top: 2px;
+      right: 2px;
+      transition: right 0.2s;  /* Smooth slide */
+    }
+    
+    .toggle.off::after { right: 24px; }
+    
+    /* ============================================
+       LOG ITEM - Color coded berdasarkan level
+       ============================================ */
+    .log-item {
+      background: var(--card);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      border: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-dim);
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    
+    .log-item.error { border-left: 3px solid var(--danger); }
+    .log-item.warn { border-left: 3px solid var(--warning); }
+    .log-item.success { border-left: 3px solid var(--success); }
+    
+    /* ============================================
+       BOTTOM NAVIGATION
+       ============================================ */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      /* Safe area untuk iPhone notch/home indicator */
+      padding-bottom: max(10px, env(safe-area-inset-bottom));
+      z-index: 100;
+    }
+    
+    .nav-item {
+      text-align: center;
+      cursor: pointer;
+      padding: 8px 16px;
+      border-radius: 12px;
+      transition: all 0.2s;
+    }
+    
+    .nav-item:active { 
+      background: var(--card-hover); 
+      transform: scale(0.95); 
+    }
+    
+    .nav-item.active { background: rgba(139, 92, 246, 0.2); }
+    .nav-icon { font-size: 22px; margin-bottom: 2px; }
+    .nav-label { font-size: 10px; color: var(--text-dim); font-weight: 600; }
+    .nav-item.active .nav-label { color: var(--accent); }
+    
+    /* ============================================
+       PAGE MANAGEMENT
+       ============================================ */
+    .page { display: none; }  /* Hidden by default */
+    .page.active { display: block; }  /* Show when active */
+    
+    .back-btn {
+      color: var(--accent);
+      font-size: 14px;
+      cursor: pointer;
+      margin-bottom: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 0;
+    }
+    
+    .back-btn:active { opacity: 0.7; }
+    
+    /* ============================================
+       TOAST NOTIFICATION
+       ============================================ */
+    .toast {
+      position: fixed;
+      bottom: 110px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--card);
+      border: 1px solid var(--accent);
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 13px;
+      z-index: 200;
+      opacity: 0;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+    
+    .toast.show { 
+      opacity: 1; 
+      transform: translateX(-50%) translateY(0); 
+    }
+    
+    /* ============================================
+       TAB BAR
+       ============================================ */
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    
+    .tab {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    
+    .tab.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  
+  <!-- ============================================
+       HOME PAGE - Halaman utama dashboard
+       ============================================ -->
+  <div id="page-home" class="page active">
+    <div class="header">
+      <div>
+        <h1>💜 Ellie Dashboard</h1>
+        <div class="status-badge">
+          <span class="status-dot"></span>
+          <span>Terhubung</span>
+        </div>
+      </div>
+      <button class="refresh-btn" onclick="refreshAll()" id="refreshBtn">
+        <span class="icon">🔄</span>
+      </button>
+    </div>
+    
+    <!-- Overview Cards - Agent & Spend -->
+    <div class="overview-grid">
+      <div class="overview-card">
+        <div class="value green" id="valAgents">1</div>
+        <div class="label">Agent Aktif</div>
+      </div>
+      <div class="overview-card">
+        <div class="value blue" id="valSpend">$0.97</div>
+        <div class="label">Hari Ini</div>
+      </div>
+    </div>
+    
+    <!-- System Health Section -->
+    <div class="section">
+      <div class="section-title">🔥 Sistem</div>
+      <div class="mini-stats">
+        <div class="mini-stat">
+          <div class="value" id="valCpu" style="color: var(--success)">45%</div>
+          <div class="label">CPU</div>
+        </div>
+        <div class="mini-stat">
+          <div class="value" id="valRam" style="color: var(--warning)">1.4GB</div>
+          <div class="label">RAM</div>
+        </div>
+        <div class="mini-stat">
+          <div class="value" id="valDisk" style="color: #3b82f6">62%</div>
+          <div class="label">DISK</div>
+        </div>
+        <div class="mini-stat">
+          <div class="value" id="valUptime" style="color: var(--accent)">1d</div>
+          <div class="label">UPTIME</div>
+        </div>
+      </div>
+      
+      <!-- RAM Progress Bar -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; font-size: 13px; color: var(--text-dim); margin-bottom: 6px;">
+          <span>RAM Usage</span>
+          <span id="valRamPct">39%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="ramBar" style="width: 39%"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="section">
+      <div class="section-title">⚡ Aksi Cepat</div>
+      <div class="action-grid">
+        <div class="action-btn" onclick="doAction('restart')">
+          <div class="action-icon">🔁</div>
+          <div class="action-label">Restart</div>
+        </div>
+        <div class="action-btn" onclick="navigateTo('sessions')">
+          <div class="action-icon">💬</div>
+          <div class="action-label">Sesi</div>
+        </div>
+        <div class="action-btn" onclick="navigateTo('crons')">
+          <div class="action-icon">⏰</div>
+          <div class="action-label">Cron</div>
+        </div>
+        <div class="action-btn" onclick="navigateTo('logs')">
+          <div class="action-icon">📋</div>
+          <div class="action-label">Log</div>
+        </div>
+        <div class="action-btn" onclick="navigateTo('files')">
+          <div class="action-icon">📁</div>
+          <div class="action-label">File</div>
+        </div>
+        <div class="action-btn" onclick="doAction('backup')">
+          <div class="action-icon">💾</div>
+          <div class="action-label">Backup</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div class="section">
+      <div class="section-title">📋 Aktivitas Terakhir</div>
+      <div id="activityList">
+        <div class="activity-item">
+          <div class="activity-left">
+            <span class="activity-icon">🤖</span>
+            <span class="activity-text">Dashboard dimuat</span>
+          </div>
+          <span class="activity-time">sekarang</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- SESSIONS PAGE -->
+  <div id="page-sessions" class="page">
+    <div class="back-btn" onclick="navigateTo('home')">← Kembali</div>
+    <div class="section-title">💬 Sesi Agent</div>
+    <div id="sessionsList"></div>
+  </div>
+  
+  <!-- CRONS PAGE -->
+  <div id="page-crons" class="page">
+    <div class="back-btn" onclick="navigateTo('home')">← Kembali</div>
+    <div class="section-title">⏰ Cron Jobs</div>
+    <div id="cronsList"></div>
+  </div>
+  
+  <!-- LOGS PAGE -->
+  <div id="page-logs" class="page">
+    <div class="back-btn" onclick="navigateTo('home')">← Kembali</div>
+    <div class="section-title">📋 System Logs</div>
+    <div id="logsList"></div>
+  </div>
+  
+  <!-- FILES PAGE -->
+  <div id="page-files" class="page">
+    <div class="back-btn" onclick="navigateTo('home')">← Kembali</div>
+    <div class="section-title">📁 Workspace Files</div>
+    <div id="filesList"></div>
+  </div>
+  
+  <!-- STATS PAGE -->
+  <div id="page-stats" class="page">
+    <div class="back-btn" onclick="navigateTo('home')">← Kembali</div>
+    <div class="section-title">💰 Biaya & Penggunaan</div>
+    <div class="tab-bar">
+      <div class="tab active" onclick="switchTab('today', this)">Hari Ini</div>
+      <div class="tab" onclick="switchTab('week', this)">7 Hari</div>
+      <div class="tab" onclick="switchTab('month', this)">30 Hari</div>
+    </div>
+    <div class="stats-grid" id="statsGrid"></div>
+  </div>
+  
+  <!-- SETTINGS PAGE -->
+  <div id="page-settings" class="page">
+    <div class="back-btn" onclick="navigateTo('home')">← Kembali</div>
+    <div class="section-title">⚙️ Pengaturan</div>
+    
+    <div class="setting-item">
+      <div>
+        <div class="setting-label">Dark Mode</div>
+        <div class="setting-desc">Selalu aktif (dark theme)</div>
+      </div>
+      <div class="toggle"></div>
+    </div>
+    
+    <div class="setting-item">
+      <div>
+        <div class="setting-label">Auto Refresh</div>
+        <div class="setting-desc">Update data setiap 30 detik</div>
+      </div>
+      <div class="toggle"></div>
+    </div>
+    
+    <div class="setting-item">
+      <div>
+        <div class="setting-label">Notifications</div>
+        <div class="setting-desc">Terima notifikasi penting</div>
+      </div>
+      <div class="toggle" onclick="this.classList.toggle('off')"></div>
+    </div>
+    
+    <div class="setting-item" onclick="doAction('restart')">
+      <div>
+        <div class="setting-label">🔁 Restart Gateway</div>
+        <div class="setting-desc">Mulai ulang service OpenClaw</div>
+      </div>
+      <span style="color: var(--accent);">→</span>
+    </div>
+  </div>
+  
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="navigateTo('home')">
+      <div class="nav-icon">🏠</div>
+      <div class="nav-label">Beranda</div>
+    </div>
+    <div class="nav-item" onclick="navigateTo('sessions')">
+      <div class="nav-icon">💬</div>
+      <div class="nav-label">Sesi</div>
+    </div>
+    <div class="nav-item" onclick="navigateTo('stats')">
+      <div class="nav-icon">📊</div>
+      <div class="nav-label">Biaya</div>
+    </div>
+    <div class="nav-item" onclick="navigateTo('settings')">
+      <div class="nav-icon">⚙️</div>
+      <div class="nav-label">Setelan</div>
+    </div>
+  </div>
+  
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">Updated!</div>
+  
+  <!-- ============================================
+       JAVASCRIPT - Frontend Logic
+       ============================================ -->
+  <script>
+    /**
+     * State management
+     */
+    let currentTab = 'today';  // Tab yang sedang aktif di stats page
+    
+    /**
+     * Navigate ke page tertentu
+     * @param {string} page - ID page yang dituju
+     */
+    function navigateTo(page) {
+      // Sembunyikan semua page
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      
+      // Tampilkan page yang dituju
+      document.getElementById('page-' + page).classList.add('active');
+      
+      // Update active state di bottom nav
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.querySelector(`.nav-item[onclick="navigateTo('${page}')"]`)?.classList.add('active');
+      
+      // Load data untuk page tersebut
+      if (page === 'sessions') loadSessions();
+      if (page === 'crons') loadCrons();
+      if (page === 'logs') loadLogs();
+      if (page === 'files') loadFiles();
+      if (page === 'stats') loadStats();
+    }
+    
+    /**
+     * Tampilkan toast notification
+     * @param {string} msg - Pesan yang ditampilkan
+     */
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      // Sembunyikan setelah 2.5 detik
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+    
+    /**
+     * Refresh semua data dari API
+     * Dipanggil saat page load dan setiap 30 detik
+     */
+    async function refreshAll() {
+      const btn = document.getElementById('refreshBtn');
+      btn.classList.add('spinning');
+      
+      try {
+        // Fetch system stats dari API
+        const res = await fetch('/api/system/stats');
+        const stats = await res.json();
+        
+        // Update UI dengan data terbaru
+        document.getElementById('valCpu').textContent = stats.cpu + '%';
+        document.getElementById('valRam').textContent = (stats.memUsed / 1024).toFixed(1) + 'GB';
+        document.getElementById('valDisk').textContent = stats.disk + '%';
+        
+        // Parse uptime - simplifikasi format
+        const uptime = stats.uptime || 'up 1 day';
+        document.getElementById('valUptime').textContent = uptime.includes('day') ? '1d' : uptime.split(' ')[0];
+        
+        document.getElementById('valRamPct').textContent = stats.memPct + '%';
+        document.getElementById('ramBar').style.width = stats.memPct + '%';
+        
+        // Update warna CPU berdasarkan usage
+        const cpuEl = document.getElementById('valCpu');
+        if (stats.cpu > 80) cpuEl.style.color = 'var(--danger)';
+        else if (stats.cpu > 50) cpuEl.style.color = 'var(--warning)';
+        else cpuEl.style.color = 'var(--success)';
+        
+        showToast('✅ Data diperbarui!');
+      } catch (e) {
+        console.error('Error fetching data:', e);
+        showToast('⚠️ Gagal fetch data');
+      }
+      
+      setTimeout(() => btn.classList.remove('spinning'), 500);
+    }
+    
+    /**
+     * Load sessions dari API
+     */
+    async function loadSessions() {
+      try {
+        const res = await fetch('/api/sessions');
+        const sessions = await res.json();
+        
+        if (sessions.length === 0) {
+          document.getElementById('sessionsList').innerHTML = '<div class="card">Tidak ada sesi aktif</div>';
+          return;
+        }
+        
+        // Render session cards
+        document.getElementById('sessionsList').innerHTML = sessions.map(s => `
+          <div class="session-card">
+            <div class="session-header">
+              <span class="session-name">${s.name || 'Agent'}</span>
+              <span class="session-badge ${s.active ? '' : 'inactive'}">${s.active ? 'AKTIF' : 'OFF'}</span>
+            </div>
+            <div class="session-meta">
+              <span>🤖 ${s.model || 'grok-4'}</span>
+              <span>🕐 ${s.lastActivity || 'unknown'}</span>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        document.getElementById('sessionsList').innerHTML = '<div class="card">Gagal load sesi</div>';
+      }
+    }
+    
+    /**
+     * Load cron jobs dari API
+     */
+    async function loadCrons() {
+      try {
+        const res = await fetch('/api/crons');
+        const crons = await res.json();
+        
+        // Render cron items dengan toggle
+        document.getElementById('cronsList').innerHTML = crons.map(c => `
+          <div class="cron-item">
+            <div class="cron-info">
+              <div class="name">${c.name}</div>
+              <div class="schedule">${c.schedule}</div>
+            </div>
+            <div class="toggle ${c.enabled ? '' : 'off'}" onclick="this.classList.toggle('off')"></div>
+          </div>
+        `).join('');
+      } catch (e) {
+        document.getElementById('cronsList').innerHTML = '<div class="card">Gagal load cron jobs</div>';
+      }
+    }
+    
+    /**
+     * Load logs dari API
+     */
+    async function loadLogs() {
+      try {
+        const res = await fetch('/api/logs');
+        const logs = await res.json();
+        
+        // Render logs dengan color coding
+        document.getElementById('logsList').innerHTML = logs.map(l => {
+          let cls = '';
+          // Tentukan class berdasarkan content
+          if (l.includes('ERROR') || l.includes('error')) cls = 'error';
+          else if (l.includes('WARN') || l.includes('warn')) cls = 'warn';
+          else if (l.includes('INFO') || l.includes('success')) cls = 'success';
+          
+          return `<div class="log-item ${cls}">${l}</div>`;
+        }).join('');
+      } catch (e) {
+        document.getElementById('logsList').innerHTML = '<div class="card">Gagal load logs</div>';
+      }
+    }
+    
+    /**
+     * Load files dari API
+     */
+    async function loadFiles() {
+      try {
+        const res = await fetch('/api/files');
+        const files = await res.json();
+        
+        if (files.length === 0) {
+          document.getElementById('filesList').innerHTML = '<div class="card">Tidak ada file</div>';
+          return;
+        }
+        
+        // Render file items dengan icon
+        document.getElementById('filesList').innerHTML = files.map(f => {
+          const name = f.split('/').pop();  // Ambil nama file saja
+          // Pilih icon berdasarkan extension
+          const icon = name.endsWith('.md') ? '📄' : name.endsWith('.json') ? '📋' : '📁';
+          return `
+            <div class="file-item">
+              <span class="file-icon">${icon}</span>
+              <span class="file-name">${name}</span>
+              <span class="file-arrow">→</span>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        document.getElementById('filesList').innerHTML = '<div class="card">Gagal load files</div>';
+      }
+    }
+    
+    /**
+     * Load statistics dari API
+     */
+    async function loadStats() {
+      try {
+        const res = await fetch('/api/costs');
+        const data = await res.json();
+        updateStats(data[currentTab] || data.today);
+      } catch (e) {
+        document.getElementById('statsGrid').innerHTML = '<div class="card">Gagal load statistik</div>';
+      }
+    }
+    
+    /**
+     * Update stats display dengan data
+     * @param {Object} data - Data statistik
+     */
+    function updateStats(data) {
+      document.getElementById('statsGrid').innerHTML = `
+        <div class="stat-card">
+          <div class="value">$${data.spend?.toFixed(2) || '0.00'}</div>
+          <div class="label">Total Biaya</div>
+        </div>
+        <div class="stat-card">
+          <div class="value">${(data.inputTokens / 1000000).toFixed(1)}M</div>
+          <div class="label">Input Tokens</div>
+        </div>
+        <div class="stat-card">
+          <div class="value">${(data.outputTokens / 1000).toFixed(0)}k</div>
+          <div class="label">Output Tokens</div>
+        </div>
+        <div class="stat-card">
+          <div class="value">${data.requests || 0}</div>
+          <div class="label">Requests</div>
+        </div>
+      `;
+    }
+    
+    /**
+     * Switch tab di stats page
+     * @param {string} tab - Tab yang dituju (today/week/month)
+     * @param {HTMLElement} el - Element yang diklik
+     */
+    function switchTab(tab, el) {
+      currentTab = tab;
+      // Update active tab
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      // Load data untuk tab baru
+      loadStats();
+    }
+    
+    /**
+     * Execute action (restart/backup)
+     * @param {string} action - Nama action
+     */
+    function doAction(action) {
+      if (action === 'restart') {
+        if (!confirm('Restart OpenClaw gateway?')) return;
+        showToast('🔁 Restarting...');
+        fetch('/api/restart').then(() => {
+          setTimeout(() => showToast('✅ Gateway restarted!'), 2000);
+        });
+      } else if (action === 'backup') {
+        showToast('💾 Backup started...');
+        fetch('/api/backup').then(r => r.json()).then(d => {
+          showToast('✅ ' + (d.message || 'Backup started!'));
+        });
+      }
+    }
+    
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+    
+    // Auto refresh setiap 30 detik
+    setInterval(refreshAll, 30000);
+    
+    // Initial load
+    refreshAll();
+    loadSessions();
+  </script>
+</body>
+</html>

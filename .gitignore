@@ -1,0 +1,33 @@
+# Environment files - DO NOT COMMIT
+*.env
+.env.*
+credentials/
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Cloudflare credentials (sensitive)
+.cloudflared/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Build outputs
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
