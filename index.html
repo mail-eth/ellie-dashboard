@@ -5,187 +5,339 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>💜 Ellie Dashboard</title>
     <style>
+        /* ============================================
+           CSS VARIABLES - Brand Consistency
+           ============================================ */
+        :root {
+            --accent: #8b5cf6;        /* Consistent purple brand */
+            --accent2: #6366f1;      /* Blue accent */
+            --bg: #0f0f23;           /* Dark background */
+            --card: #1a1a24;         /* Card background */
+            --card-hover: #222233;    /* Card hover */
+            --border: #2a2a3a;        /* Border color */
+            --text: #e2e8f0;         /* Main text */
+            --text-dim: #94a3b8;     /* Dim text */
+            --success: #4ade80;       /* Green */
+            --warning: #fbbf24;       /* Yellow */
+            --danger: #f87171;        /* Red */
+        }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+            background: linear-gradient(135deg, var(--bg) 0%, #1a1a2e 100%);
             min-height: 100vh;
-            color: #fff;
+            color: var(--text);
             padding: 20px;
+            padding-bottom: 100px;
         }
+        
         .container { max-width: 900px; margin: 0 auto; }
         
         h1 {
             text-align: center;
             margin-bottom: 30px;
             font-size: 2rem;
-            background: linear-gradient(90deg, #667eea, #764ba2);
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            overflow-x: auto;
-            padding-bottom: 8px;
+        /* ============================================
+           PAGES - Smooth Transitions
+           ============================================ */
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
         }
-        .tab {
-            padding: 10px 20px;
-            border-radius: 25px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.3s;
-        }
-        .tab.active {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-color: transparent;
-        }
-        .tab:hover { background: rgba(255,255,255,0.1); }
+        .page.active { display: block; }
         
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* ============================================
+           CARDS - Visual Depth & Glow
+           ============================================ */
         .card {
-            background: rgba(255,255,255,0.05);
+            background: var(--card);
             border-radius: 16px;
             padding: 24px;
             margin-bottom: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
         }
+        .card:hover {
+            border-color: rgba(139, 92, 246, 0.3);
+            transform: translateY(-2px);
+        }
+        
         .card h2 {
             margin-bottom: 16px;
             font-size: 1.1rem;
-            color: #a0a0a0;
+            color: var(--text-dim);
             display: flex;
             align-items: center;
             gap: 8px;
         }
         
+        /* Highlight Card with Glow */
+        .highlight-card {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 20px;
+            padding: 35px 30px;
+            text-align: center;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.4);
+        }
+        .highlight-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .highlight-card h2 { 
+            color: rgba(255,255,255,0.85); 
+            margin-bottom: 12px; 
+            font-size: 1rem;
+        }
+        .highlight-card .amount { 
+            font-size: 3.2rem; 
+            font-weight: bold; 
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .highlight-card .sub { 
+            color: rgba(255,255,255,0.75); 
+            margin-top: 10px;
+        }
+        
+        /* ============================================
+           STAT GRID
+           ============================================ */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 14px;
         }
-        .stat {
-            background: rgba(255,255,255,0.03);
-            padding: 16px;
-            border-radius: 12px;
-            text-align: center;
-        }
-        .stat .label { color: #888; font-size: 0.85rem; margin-bottom: 8px; }
-        .stat .value { font-size: 1.8rem; font-weight: bold; }
-        .stat .value.green { color: #4ade80; }
-        .stat .value.red { color: #f87171; }
-        .stat .value.yellow { color: #fbbf24; }
-        .stat .value.blue { color: #60a5fa; }
-        .stat .value.purple { color: #a78bfa; }
         
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        .stat {
+            background: var(--card);
+            padding: 18px 14px;
+            border-radius: 14px;
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
         }
+        .stat:hover {
+            border-color: var(--accent);
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.15);
+        }
+        .stat .icon { font-size: 1.8rem; margin-bottom: 8px; }
+        .stat .label { color: var(--text-dim); font-size: 0.8rem; margin-bottom: 8px; }
+        .stat .value { font-size: 1.6rem; font-weight: bold; }
+        .stat .value.green { color: var(--success); }
+        .stat .value.red { color: var(--danger); }
+        .stat .value.yellow { color: var(--warning); }
+        .stat .value.blue { color: #60a5fa; }
+        .stat .value.purple { color: var(--accent); }
+        
+        /* Stat value pulse for live data */
+        .stat .value.pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        /* ============================================
+           TABLES
+           ============================================ */
+        table { width: 100%; border-collapse: collapse; }
         th, td {
-            padding: 12px;
+            padding: 14px 12px;
             text-align: left;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid var(--border);
         }
-        th { color: #888; font-weight: 500; }
+        th { color: var(--text-dim); font-weight: 500; font-size: 0.85rem; }
+        td { font-size: 0.95rem; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(139, 92, 246, 0.05); }
+        
         .right { text-align: right; }
         
+        /* ============================================
+           BADGES
+           ============================================ */
         .badge {
-            padding: 4px 10px;
-            border-radius: 6px;
+            padding: 5px 12px;
+            border-radius: 8px;
             font-size: 0.75rem;
             font-weight: bold;
         }
-        .badge.green { background: rgba(74, 222, 128, 0.2); color: #4ade80; }
-        .badge.yellow { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
-        .badge.red { background: rgba(248, 113, 113, 0.2); color: #f87171; }
-        .badge.purple { background: rgba(167, 139, 250, 0.2); color: #a78bfa; }
+        .badge.green { background: rgba(74, 222, 128, 0.15); color: var(--success); }
+        .badge.yellow { background: rgba(251, 191, 36, 0.15); color: var(--warning); }
+        .badge.red { background: rgba(248, 113, 113, 0.15); color: var(--danger); }
+        .badge.purple { background: rgba(139, 92, 246, 0.15); color: var(--accent); }
         
-        .highlight-card {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 16px;
-            padding: 30px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .highlight-card h2 { color: rgba(255,255,255,0.8); margin-bottom: 10px; font-size: 1rem; }
-        .highlight-card .amount { font-size: 3rem; font-weight: bold; color: #fff; }
-        .highlight-card .sub { color: rgba(255,255,255,0.7); margin-top: 8px; }
-        
+        /* ============================================
+           SECTION TITLE
+           ============================================ */
         .section-title {
-            font-size: 0.9rem;
-            color: #666;
-            margin: 20px 0 10px 0;
-            padding-left: 12px;
-            border-left: 3px solid #667eea;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin: 24px 0 12px 0;
+            padding-left: 14px;
+            border-left: 3px solid var(--accent);
         }
         
+        /* ============================================
+           MINI STATS
+           ============================================ */
         .mini-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 12px;
-            margin-top: 12px;
         }
         .mini-stat {
-            background: rgba(255,255,255,0.03);
-            padding: 12px;
-            border-radius: 10px;
+            background: var(--card);
+            padding: 14px 10px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        .mini-stat .val { font-size: 1.1rem; font-weight: bold; }
+        .mini-stat .lbl { font-size: 0.65rem; color: var(--text-dim); margin-top: 6px; }
+        
+        /* ============================================
+           PROFIT INFO
+           ============================================ */
+        .profit-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .profit-item {
+            background: rgba(74, 222, 128, 0.08);
+            border: 1px solid rgba(74, 222, 128, 0.2);
+            padding: 16px;
+            border-radius: 14px;
             text-align: center;
         }
-        .mini-stat .val { font-size: 1.2rem; font-weight: bold; }
-        .mini-stat .lbl { font-size: 0.7rem; color: #888; margin-top: 4px; }
+        .profit-item .val { font-size: 1.4rem; font-weight: bold; color: var(--success); }
+        .profit-item .lbl { font-size: 0.7rem; color: var(--text-dim); margin-top: 6px; }
         
+        /* ============================================
+           BOTTOM NAV - Better Active Indicator
+           ============================================ */
         .nav-bottom {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(15, 15, 20, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 12px 20px;
+            background: rgba(15, 15, 20, 0.98);
+            backdrop-filter: blur(12px);
+            padding: 10px 16px 20px;
             display: flex;
             justify-content: space-around;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            border-top: 1px solid var(--border);
+            z-index: 100;
         }
+        
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
             cursor: pointer;
-            padding: 8px 16px;
-            border-radius: 12px;
-            transition: all 0.3s;
+            padding: 10px 16px;
+            border-radius: 14px;
+            transition: all 0.3s ease;
+            position: relative;
         }
-        .nav-item.active { background: rgba(102, 126, 234, 0.2); }
-        .nav-item .icon { font-size: 1.5rem; }
-        .nav-item .text { font-size: 0.7rem; color: #888; }
-        .nav-item.active .text { color: #667eea; }
-        
-        .page { display: none; }
-        .page.active { display: block; }
-        
-        .profit-info {
-            display: flex;
-            gap: 12px;
-            margin-top: 16px;
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%) scaleX(0);
+            width: 30px;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 0 0 3px 3px;
+            transition: transform 0.3s ease;
         }
-        .profit-item {
-            flex: 1;
-            background: rgba(255,255,255,0.03);
-            padding: 14px;
-            border-radius: 12px;
+        .nav-item.active::after {
+            transform: translateX(-50%) scaleX(1);
+        }
+        .nav-item.active {
+            background: rgba(139, 92, 246, 0.15);
+        }
+        .nav-item .icon { font-size: 1.6rem; }
+        .nav-item .text { 
+            font-size: 0.65rem; 
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+        .nav-item.active .text { color: var(--accent); }
+        
+        /* Nav tap feedback */
+        .nav-item:active {
+            transform: scale(0.92);
+        }
+        
+        /* ============================================
+           QUICK ACTIONS - Better Hover
+           ============================================ */
+        .stat.clickable {
+            cursor: pointer;
+        }
+        .stat.clickable:hover {
+            border-color: var(--accent);
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2);
+        }
+        .stat.clickable:active {
+            transform: scale(0.96);
+        }
+        
+        /* ============================================
+           EMPTY STATE
+           ============================================ */
+        .empty-state {
             text-align: center;
+            padding: 40px 20px;
+            color: var(--text-dim);
         }
-        .profit-item .val { font-size: 1.3rem; font-weight: bold; color: #4ade80; }
-        .profit-item .lbl { font-size: 0.7rem; color: #888; margin-top: 4px; }
+        .empty-state .emoji { font-size: 3.5rem; margin-bottom: 16px; }
+        
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 480px) {
+            .mini-grid { grid-template-columns: repeat(2, 1fr); }
+            .profit-info { grid-template-columns: 1fr; }
+            .highlight-card .amount { font-size: 2.5rem; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        
         <!-- HOME PAGE -->
         <div id="page-home" class="page active">
             <h1>💜 Ellie Dashboard</h1>
@@ -199,7 +351,7 @@
             <div class="grid">
                 <div class="stat">
                     <div class="label">Balance</div>
-                    <div class="value green">$124.78</div>
+                    <div class="value green pulse">$124.78</div>
                 </div>
                 <div class="stat">
                     <div class="label">Monthly Cost</div>
@@ -210,27 +362,27 @@
                     <div class="value blue">$3.73</div>
                 </div>
                 <div class="stat">
-                    <div class="label">Open Positions</div>
+                    <div class="label">Positions</div>
                     <div class="value purple">0</div>
                 </div>
             </div>
             
-            <div class="card" style="margin-top: 20px;">
+            <div class="card" style="margin-top: 24px;">
                 <h2>⚡ Quick Actions</h2>
                 <div class="grid">
-                    <div class="stat" style="cursor: pointer;" onclick="showPage('finance')">
+                    <div class="stat clickable" onclick="showPage('finance')">
                         <div class="icon">💰</div>
                         <div class="label">Finance</div>
                     </div>
-                    <div class="stat" style="cursor: pointer;" onclick="showPage('trading')">
+                    <div class="stat clickable" onclick="showPage('trading')">
                         <div class="icon">📈</div>
                         <div class="label">Trading</div>
                     </div>
-                    <div class="stat" style="cursor: pointer;" onclick="showPage('signals')">
+                    <div class="stat clickable" onclick="showPage('signals')">
                         <div class="icon">🔔</div>
                         <div class="label">Signals</div>
                     </div>
-                    <div class="stat" style="cursor: pointer;" onclick="showPage('system')">
+                    <div class="stat clickable" onclick="showPage('system')">
                         <div class="icon">🖥️</div>
                         <div class="label">System</div>
                     </div>
@@ -251,22 +403,22 @@
             <div class="card">
                 <h2>📊 Cost Breakdown</h2>
                 
-                <div class="section-title">🤖 LLM</div>
+                <div class="section-title">🤖 LLM Services</div>
                 <table>
                     <tr><td>MiniMax (Main)</td><td class="right">$15/mo</td><td><span class="badge yellow">ACTIVE</span></td></tr>
                     <tr><td>Grok/xAI</td><td class="right">$50/mo</td><td><span class="badge yellow">$50</span></td></tr>
                     <tr><td>ChatGPT Plus</td><td class="right">$20/mo</td><td><span class="badge yellow">$20</span></td></tr>
                 </table>
                 
-                <div class="section-title">🖥️ VPS</div>
+                <div class="section-title">🖥️ VPS Hosting</div>
                 <table>
                     <tr><td>GoldVPS 43.163.99.210</td><td class="right">$27/mo</td><td><span class="badge yellow">ACTIVE</span></td></tr>
                     <tr><td>VPS 139.60.163.206</td><td class="right">—</td><td><span class="badge purple">UNUSED</span></td></tr>
                 </table>
                 
-                <div class="section-title">☁️ Other</div>
+                <div class="section-title">☁️ Free Services</div>
                 <table>
-                    <tr><td>Vercel</td><td class="right">FREE</td><td><span class="badge green">FREE</span></td></tr>
+                    <tr><td>Vercel Hosting</td><td class="right">FREE</td><td><span class="badge green">FREE</span></td></tr>
                     <tr><td>Binance API</td><td class="right">FREE</td><td><span class="badge green">FREE</span></td></tr>
                     <tr><td>Telegram Bot</td><td class="right">FREE</td><td><span class="badge green">FREE</span></td></tr>
                 </table>
@@ -277,11 +429,11 @@
                 <div class="profit-info">
                     <div class="profit-item">
                         <div class="val">$624</div>
-                        <div class="lbl">+5%/day × 30d</div>
+                        <div class="lbl">+5%/day × 30 days</div>
                     </div>
                     <div class="profit-item">
                         <div class="val">$2,177</div>
-                        <div class="lbl">+10%/day × 30d</div>
+                        <div class="lbl">+10%/day × 30 days</div>
                     </div>
                 </div>
                 <div class="profit-info" style="margin-top: 12px;">
@@ -309,14 +461,15 @@
             
             <div class="card">
                 <h2>📍 Open Positions</h2>
-                <div style="text-align: center; padding: 30px; color: #888;">
-                    No open positions<br><br>
-                    <span style="font-size: 3rem;">📭</span>
+                <div class="empty-state">
+                    <div class="emoji">📭</div>
+                    <p>No open positions</p>
+                    <p style="font-size: 0.85rem; margin-top: 8px;">Waiting for V3 signals...</p>
                 </div>
             </div>
             
             <div class="card">
-                <h2>📊 Today's Stats</h2>
+                <h2>📊 Performance</h2>
                 <div class="grid">
                     <div class="stat">
                         <div class="label">Trades</div>
@@ -332,7 +485,7 @@
                     </div>
                     <div class="stat">
                         <div class="label">Strategy</div>
-                        <div class="value blue">V3</div>
+                        <div class="value purple">V3</div>
                     </div>
                 </div>
             </div>
@@ -343,29 +496,30 @@
             <h1>🔔 Signals</h1>
             
             <div class="card">
-                <h2>V3 Strategy (RSI ≤ 40 + EMA200)</h2>
-                <div style="color: #888; margin-bottom: 16px;">
-                    Entry: RSI oversold + above EMA200<br>
-                    SL: Entry - (ATR × 3)<br>
-                    TP: Entry + (ATR × 6)
+                <h2>V3 Strategy</h2>
+                <div style="color: var(--text-dim); line-height: 1.7;">
+                    <strong>Entry:</strong> RSI ≤ 40 + above EMA200<br>
+                    <strong>Stop Loss:</strong> Entry - (ATR × 3)<br>
+                    <strong>Take Profit:</strong> Entry + (ATR × 6)<br>
+                    <strong>R:R Ratio:</strong> ~2:1
                 </div>
                 
                 <div class="section-title">📊 Market RSI</div>
                 <table>
-                    <tr><td>BTCUSDT</td><td class="right">55.6</td><td><span class="badge yellow">ABOVE 40</span></td></tr>
-                    <tr><td>ETHUSDT</td><td class="right">50.1</td><td><span class="badge yellow">ABOVE 40</span></td></tr>
-                    <tr><td>SOLUSDT</td><td class="right">61.2</td><td><span class="badge yellow">ABOVE 40</span></td></tr>
+                    <tr><td>BTCUSDT</td><td class="right">55.6</td><td><span class="badge yellow">HIGH</span></td></tr>
+                    <tr><td>ETHUSDT</td><td class="right">50.1</td><td><span class="badge yellow">HIGH</span></td></tr>
+                    <tr><td>SOLUSDT</td><td class="right">61.2</td><td><span class="badge yellow">HIGH</span></td></tr>
                     <tr><td>LINKUSDT</td><td class="right">51.2</td><td><span class="badge red">BELOW EMA</span></td></tr>
-                    <tr><td>NEARUSDT</td><td class="right">62.1</td><td><span class="badge yellow">ABOVE 40</span></td></tr>
+                    <tr><td>NEARUSDT</td><td class="right">62.1</td><td><span class="badge yellow">HIGH</span></td></tr>
                 </table>
             </div>
             
             <div class="card">
                 <h2>🟢 Active Signals</h2>
-                <div style="text-align: center; padding: 30px; color: #888;">
-                    No signals currently<br>
-                    RSI semua > 40 (market bullish)<br><br>
-                    <span style="font-size: 3rem;">⏰</span>
+                <div class="empty-state">
+                    <div class="emoji">⏰</div>
+                    <p>No signals right now</p>
+                    <p style="font-size: 0.85rem; margin-top: 8px;">RSI all > 40 (market bullish)</p>
                 </div>
             </div>
         </div>
@@ -378,11 +532,11 @@
                 <h2>📊 VPS Status</h2>
                 <div class="mini-grid">
                     <div class="mini-stat">
-                        <div class="val" style="color: #4ade80;">ONLINE</div>
+                        <div class="val" style="color: var(--success);">ONLINE</div>
                         <div class="lbl">Status</div>
                     </div>
                     <div class="mini-stat">
-                        <div class="val">43.163.99.210</div>
+                        <div class="val">43.163</div>
                         <div class="lbl">IP Address</div>
                     </div>
                     <div class="mini-stat">
@@ -397,7 +551,7 @@
             </div>
             
             <div class="card">
-                <h2>🦞 OpenClaw Agent</h2>
+                <h2>🦞 Ellie Agent</h2>
                 <div class="grid">
                     <div class="stat">
                         <div class="label">Model</div>
@@ -421,10 +575,9 @@
             <div class="card">
                 <h2>🔗 Services</h2>
                 <table>
-                    <tr><td>Trading Dashboard</td><td class="right"><span class="badge green">:3000</span></td></tr>
+                    <tr><td>Trading Dashboard</td><td class="right"><span class="badge purple">:3000</span></td></tr>
                     <tr><td>Ellie Dashboard</td><td class="right"><span class="badge green">VERCEL</span></td></tr>
-                    <tr><td>Cost Tracker</td><td class="right"><span class="badge green">:3001</span></td></tr>
-                    <tr><td>Mission Control</td><td class="right"><span class="badge green">:45680</span></td></tr>
+                    <tr><td>Mission Control</td><td class="right"><span class="badge purple">:45680</span></td></tr>
                 </table>
             </div>
         </div>
@@ -456,9 +609,16 @@
     
     <script>
         function showPage(page) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            // Get all pages and nav items
+            const pages = document.querySelectorAll('.page');
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            // Remove active from all
+            pages.forEach(p => p.classList.remove('active'));
+            navItems.forEach(n => n.classList.remove('active'));
+            
+            // Add active to selected
             document.getElementById('page-' + page).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             event.currentTarget.classList.add('active');
         }
     </script>
