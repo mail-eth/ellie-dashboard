@@ -418,7 +418,57 @@
       color: white;
       border-color: var(--accent);
     }
-  </style>
+  
+    .finance-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      margin-bottom: 14px;
+    }
+    .finance-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .finance-title { font-size: 14px; font-weight: 600; }
+    .finance-badge {
+      font-size: 10px; padding: 4px 8px; border-radius: 6px;
+      background: rgba(139, 92, 246, 0.2); color: var(--accent);
+    }
+    .finance-row {
+      display: flex; justify-content: space-between;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+    }
+    .finance-row:last-child { border-bottom: none; }
+    .finance-label { color: var(--text-dim); font-size: 13px; }
+    .finance-value { font-weight: 600; font-size: 14px; }
+    .finance-value.green { color: var(--success); }
+    .finance-value.yellow { color: var(--warning); }
+    .finance-total {
+      font-size: 24px; font-weight: 700; text-align: center;
+      padding: 20px 0;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .finance-proj {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; margin-top: 14px;
+    }
+    .proj-item {
+      background: rgba(255,255,255,0.03); padding: 12px;
+      border-radius: 10px; text-align: center;
+    }
+    .proj-value { font-size: 16px; font-weight: 700; color: var(--success); }
+    .proj-label { font-size: 10px; color: var(--text-dim); margin-top: 4px; }
+    .finance-section-title {
+      font-size: 12px; color: var(--text-dim);
+      margin: 16px 0 8px 0; padding-left: 8px;
+      border-left: 3px solid var(--accent);
+    }
+
+</style>
 </head>
 <body>
   
@@ -568,7 +618,69 @@
       <div class="tab" onclick="switchTab('week', this)">7 Hari</div>
       <div class="tab" onclick="switchTab('month', this)">30 Hari</div>
     </div>
-    <div class="stats-grid" id="statsGrid"></div>
+    
+<div class="finance-card">
+  <div class="finance-header">
+    <span class="finance-title">💜 Ellie Finance</span>
+    <span class="finance-badge">LIVE</span>
+  </div>
+  <div class="finance-total">$42/mo</div>
+  <div class="finance-row">
+    <span class="finance-label">Monthly Target</span>
+    <span class="finance-value yellow">$42</span>
+  </div>
+  <div class="finance-row">
+    <span class="finance-label">Daily Target (5%)</span>
+    <span class="finance-value">$1.40</span>
+  </div>
+  <div class="finance-row">
+    <span class="finance-label">Current Balance</span>
+    <span class="finance-value green">$124.78</span>
+  </div>
+</div>
+
+<div class="finance-card">
+  <div class="finance-section-title">🤖 LLM Costs</div>
+  <div class="finance-row">
+    <span class="finance-label">MiniMax (Main)</span>
+    <span class="finance-value">$15/mo</span>
+  </div>
+  <div class="finance-row">
+    <span class="finance-label">Grok/xAI</span>
+    <span class="finance-value green">FREE</span>
+  </div>
+  <div class="finance-row">
+    <span class="finance-label">OpenAI (Backup)</span>
+    <span class="finance-value green">FREE</span>
+  </div>
+</div>
+
+<div class="finance-card">
+  <div class="finance-section-title">🖥️ VPS Costs</div>
+  <div class="finance-row">
+    <span class="finance-label">GoldVPS 43.163.99.210</span>
+    <span class="finance-value">$27/mo</span>
+  </div>
+  <div class="finance-row">
+    <span class="finance-label">VPS 139.60.163.206</span>
+    <span class="finance-value green">NOT USED</span>
+  </div>
+</div>
+
+<div class="finance-card">
+  <div class="finance-section-title">📈 Growth Projections</div>
+  <div class="finance-proj">
+    <div class="proj-item">
+      <div class="proj-value">$624</div>
+      <div class="proj-label">+5%/day × 30d</div>
+    </div>
+    <div class="proj-item">
+      <div class="proj-value">$2,177</div>
+      <div class="proj-label">+10%/day × 30d</div>
+    </div>
+  </div>
+</div>
+
   </div>
   
   <!-- SETTINGS PAGE -->
